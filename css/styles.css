@@ -1,0 +1,41 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+#search form {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+#search input[type="text"] {
+    width: 70%;
+    padding: 10px;
+}
+#search button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+}
+#product-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+.product {
+    border: 1px solid #ddd;
+    margin: 10px;
+    padding: 10px;
+    width: calc(25% - 20px);
+}
+.product img {
+    width: 100%;
+    height: auto;
+}
