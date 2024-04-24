@@ -1,14 +1,15 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const searchForm = document.getElementById('search-form');
-    const searchInput = document.getElementById('search-input');
-    const productGallery = document.getElementById('product-gallery');
-    const countrySelector = document.getElementById('country-selector');
+$(document).ready(function() {
+    const searchForm = $('#search-form');
+    const searchInput = $('#search-input');
+    const productGallery = $('#product-gallery');
+    const countrySelector = $('#country-selector');
 
     function initializeSelect2(countryCode) {
-        $(countrySelector).select2({
+        countrySelector.select2({
             templateResult: formatCountry,
             templateSelection: formatCountry
         }).val(countryCode).trigger('change');
+        console.log("Select2 initialized with country code: ", countryCode);
     }
 
     function formatCountry(country) {
@@ -20,34 +21,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function handleGeolocationError(error) {
         console.warn("Geolocation error: ", error.message);
-        fetchCountryByIP();  // Fallback to IP-based location
+        fetchCountryByIP();
     }
 
     function fetchCountryByIP() {
         fetch('./includes/location.php')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log("Country code fetched by IP: ", data.country_code);
                 if (data.country_code && data.country_code !== 'Unknown') {
                     initializeSelect2(data.country_code);
                 } else {
                     initializeSelect2WithoutCountry();
                 }
             })
-            .catch(() => initializeSelect2WithoutCountry());
+            .catch(error => {
+                console.error("Failed to fetch country by IP:", error);
+                initializeSelect2WithoutCountry();
+            });
     }
 
+
     function initializeSelect2WithoutCountry() {
-        $(countrySelector).select2({
+        countrySelector.select2({
             templateResult: formatCountry,
             templateSelection: formatCountry
         });
+        console.log("Initialized Select2 without country data.");
     }
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
+            console.log("Latitude: ", position.coords.latitude);
+            console.log("Longitude: ", position.coords.longitude); // Log latitude and longitude
+
             fetch(`./includes/location.php?lat=${position.coords.latitude}&lon=${position.coords.longitude}`)
                 .then(response => response.json())
-                .then(data => initializeSelect2(data.country_code))
+                .then(data => {
+                    console.log("Country code fetched by geolocation: ", data.country_code);
+                    if (data.country_code !== 'Unknown') {
+                        initializeSelect2(data.country_code);
+                    } else {
+                        fetchCountryByIP();
+                    }
+                })
                 .catch(handleGeolocationError);
         }, handleGeolocationError);
     } else {
@@ -55,13 +77,13 @@ document.addEventListener("DOMContentLoaded", function () {
         fetchCountryByIP();
     }
 
-    searchForm.addEventListener('submit', event => {
+    searchForm.submit(function(event) {
         event.preventDefault();
-        fetchProducts(searchInput.value, $(countrySelector).val());
+        fetchProducts(searchInput.val(), countrySelector.val());
     });
 
-    countrySelector.on('change', () => {
-        fetchProducts(searchInput.value, $(countrySelector).val());
+    countrySelector.on('change', function() {
+        fetchProducts(searchInput.val(), $(this).val());
     });
 
     function fetchProducts(searchTerm, country) {
@@ -72,23 +94,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateProductGallery(data) {
-        productGallery.innerHTML = '';
+        productGallery.empty();
         if (data.length > 0) {
             data.forEach(product => {
-                const productDiv = document.createElement('div');
-                productDiv.className = 'product';
-                productDiv.innerHTML = `
+                const productDiv = $('<div>', {class: 'product'}).html(`
                     <img src="img/${product.image}" alt="${product.name}">
                     <h3>${product.name}</h3>
                     <p>${product.description}</p>
                     <p>Barcode: ${product.barcode}</p>
                     <p>Company: ${product.company_name}</p>
                     <a href="${product.article_link}" target='_blank'>Why we boycott this</a>
-                `;
-                productGallery.appendChild(productDiv);
+                `);
+                productGallery.append(productDiv);
             });
         } else {
-            productGallery.innerHTML = '<p>No products found.</p>';
+            productGallery.html('<p>No products found.</p>');
         }
     }
 });
