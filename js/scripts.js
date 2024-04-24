@@ -24,6 +24,8 @@ $(document).ready(function() {
         fetchCountryByIP();
     }
 
+
+
     function fetchCountryByIP() {
         fetch('./includes/location.php')
             .then(response => {
@@ -46,6 +48,47 @@ $(document).ready(function() {
             });
     }
 
+// Function to fetch country from Nominatim API using coordinates
+    async function fetchCountryFromCoordinates(latitude, longitude) {
+        console.log(typeof(latitude));
+        const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
+
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            // Extract country from response data
+            const country = data.address.country;
+
+            return country;
+        } catch (error) {
+            console.error('Error fetching country:', error);
+            return null;
+        }
+    }
+
+    function getCountry(){
+        let latitude
+        let longitude
+        if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(position => {
+                latitude = position.coords.latitude;
+                longitude = position.coords.longitude;
+                fetchCountryFromCoordinates(latitude, longitude)
+                    .then(country => {
+                        if (country) {
+                            console.log('Country:', country);
+                        } else {
+                            console.log('Country not found.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }, handleGeolocationError);
+
+        }
+    }
 
     function initializeSelect2WithoutCountry() {
         countrySelector.select2({
@@ -56,6 +99,8 @@ $(document).ready(function() {
     }
 
     if (navigator.geolocation) {
+        getCountry();
+
         navigator.geolocation.getCurrentPosition(position => {
             console.log("Latitude: ", position.coords.latitude);
             console.log("Longitude: ", position.coords.longitude); // Log latitude and longitude
