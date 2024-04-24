@@ -4,25 +4,25 @@ $(document).ready(function() {
     const productGallery = $('#product-gallery');
     const countrySelector = $('#country-selector');
 
-    function initializeSelect2(countryCode) {
-        countrySelector.select2({
-            templateResult: formatCountry,
-            templateSelection: formatCountry
-        }).val(countryCode).trigger('change');
-        console.log("Select2 initialized with country code: ", countryCode);
-    }
-
-    function formatCountry(country) {
-        if (!country.id) {
-            return country.text;
-        }
-        return $(`<span class="flag-icon flag-icon-${country.id.toLowerCase()}"></span><span>${country.text}</span>`);
-    }
-
-    function handleGeolocationError(error) {
-        console.warn("Geolocation error: ", error.message);
-        fetchCountryByIP();
-    }
+    // function initializeSelect2(countryCode) {
+    //     countrySelector.select2({
+    //         templateResult: formatCountry,
+    //         templateSelection: formatCountry
+    //     }).val(countryCode).trigger('change');
+    //     console.log("Select2 initialized with country code: ", countryCode);
+    // }
+    //
+    // function formatCountry(country) {
+    //     if (!country.id) {
+    //         return country.text;
+    //     }
+    //     return $(`<span class="flag-icon flag-icon-${country.id.toLowerCase()}"></span><span>${country.text}</span>`);
+    // }
+    //
+    // function handleGeolocationError(error) {
+    //     console.warn("Geolocation error: ", error.message);
+    //     fetchCountryByIP();
+    // }
 
 
 
