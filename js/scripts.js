@@ -4,49 +4,48 @@ $(document).ready(function() {
     const productGallery = $('#product-gallery');
     const countrySelector = $('#country-selector');
 
-    // function initializeSelect2(countryCode) {
-    //     countrySelector.select2({
-    //         templateResult: formatCountry,
-    //         templateSelection: formatCountry
-    //     }).val(countryCode).trigger('change');
-    //     console.log("Select2 initialized with country code: ", countryCode);
-    // }
-    //
-    // function formatCountry(country) {
-    //     if (!country.id) {
-    //         return country.text;
-    //     }
-    //     return $(`<span class="flag-icon flag-icon-${country.id.toLowerCase()}"></span><span>${country.text}</span>`);
-    // }
-    //
-    // function handleGeolocationError(error) {
-    //     console.warn("Geolocation error: ", error.message);
-    //     fetchCountryByIP();
-    // }
-
-
-
-    function fetchCountryByIP() {
-        fetch('./includes/location.php')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Country code fetched by IP: ", data.country_code);
-                if (data.country_code && data.country_code !== 'Unknown') {
-                    initializeSelect2(data.country_code);
-                } else {
-                    initializeSelect2WithoutCountry();
-                }
-            })
-            .catch(error => {
-                console.error("Failed to fetch country by IP:", error);
-                initializeSelect2WithoutCountry();
-            });
+    function initializeSelect2(countryCode) {
+        countrySelector.select2({
+            templateResult: formatCountry,
+            templateSelection: formatCountry
+        }).val(countryCode).trigger('change');
+        console.log("Select2 initialized with country code: ", countryCode);
     }
+
+    function formatCountry(country) {
+        if (!country.id) {
+            return country.text;
+        }
+        return $(`<span class="flag-icon flag-icon-${country.id.toLowerCase()}"></span><span>${country.text}</span>`);
+    }
+
+    function handleGeolocationError(error) {
+        console.warn("Geolocation error: ", error.message);
+    }
+
+
+
+    // function fetchCountryByIP() {
+    //     fetch('./includes/location.php')
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error('Network response was not ok');
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             console.log("Country code fetched by IP: ", data.country_code);
+    //             if (data.country_code && data.country_code !== 'Unknown') {
+    //                 initializeSelect2(data.country_code);
+    //             } else {
+    //                 initializeSelect2WithoutCountry();
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error("Failed to fetch country by IP:", error);
+    //             initializeSelect2WithoutCountry();
+    //         });
+    // }
 
 // Function to fetch country from Nominatim API using coordinates
     async function fetchCountryFromCoordinates(latitude, longitude) {
